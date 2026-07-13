@@ -6,10 +6,14 @@
 #
 # Runs daily: the three government sources each publish about monthly but on an
 # unpredictable day, so a daily poll catches new figures within 24h. Runs are cheap and
-# gentle on the sources — the Visa Bulletin page cache re-fetches only genuinely new
-# months, MOJ re-pulls just its trailing 8-month window, and the ISA scraper re-downloads
-# only new months plus a 2-month restatement recheck. Almost every run finds nothing new,
-# passes the regression gate, and commits nothing. Also triggerable from the Actions tab.
+# gentle on the sources — each scraper fetches only what's new: the Visa Bulletin page
+# cache re-fetches only genuinely new months, and MOJ/ISA re-download just the index
+# months missing from the dataset plus a short restatement recheck. Almost every run
+# finds nothing new, passes the regression gate, and commits nothing.
+#
+# Once a month (the 1st) the otherwise-immutable Visa Bulletin cache drops its trailing
+# 24 months so State's corrections to recent bulletins are re-fetched; a manual run with
+# full_refresh=true re-downloads the whole cache. Also triggerable from the Actions tab.
 
 name: Refresh datasets
 
@@ -17,6 +21,11 @@ on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
+    inputs:
+      full_refresh:
+        description: "Re-download ALL cached Visa Bulletin pages, not just the trailing window"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -34,6 +43,21 @@ jobs:
           key: visa-bulletin-pages-${{ github.run_id }}
           restore-keys: visa-bulletin-pages-
 
+      # The page cache is immutable, so State's corrections to an already-cached bulletin
+      # are otherwise never seen. Once a month, drop the trailing 24 months (where such
+      # corrections realistically land) so the fetch below re-downloads them; a manual
+      # run with full_refresh=true drops the whole cache. Ordinary daily runs keep it.
+      - name: Revalidate recent bulletin pages
+        run: |
+          python3 scripts/revalidate_vb_cache.py --self-test
+          if [ "${{ github.event.inputs.full_refresh }}" = "true" ]; then
+            python3 scripts/revalidate_vb_cache.py --cache-dir .cache/vb --all
+          elif [ "$(date -u +%d)" = "01" ]; then
+            python3 scripts/revalidate_vb_cache.py --cache-dir .cache/vb --months 24
+          else
+            echo "Daily incremental: keeping cached bulletin pages."
+          fi
+
       - name: Refresh U.S. Visa Bulletin
         run: |
           python3 scripts/fetch_visa_bulletin.py --self-test
@@ -44,16 +68,7 @@ jobs:
       - name: Refresh Japan flow (MOJ monthly Excel)
         run: |
           python3 scripts/fetch_moj_monthly.py --self-test
-          RECENT=$(python3 -c "
-          from datetime import date
-          y, m = date.today().year, date.today().month
-          months = []
-          for _ in range(8):
-              months.append(f'{y:04d}-{m:02d}')
-              y, m = (y, m - 1) if m > 1 else (y - 1, 12)
-          print(','.join(reversed(months)))
-          ")
-          python3 scripts/fetch_moj_monthly.py --months "$RECENT" \
+          python3 scripts/fetch_moj_monthly.py --months incremental \
             --merge-into japan_monthly_stats.json
 
       - name: Refresh ISA processing periods

@@ -48,6 +48,8 @@ GAP_MONTHS = ([f"2018-{m:02d}" for m in range(2, 13)]
               + [f"2019-{m:02d}" for m in range(1, 13)]
               + [f"2020-{m:02d}" for m in range(1, 11)])
 
+RECHECK_MONTHS = 3   # in --months incremental, re-fetch this many trailing months
+
 # Office name -> app office id; parents map to the (うち) sub-columns subtracted from them.
 MAIN_OFFICES = {
     "札幌": "sapporo", "仙台": "sendai", "東京": "tokyo", "名古屋": "nagoya",
@@ -433,6 +435,13 @@ def self_test():
     expect(new_by["tokyo"]["denied"] == 880 - 160, "2022 tokyo denied residual")
     expect(verify_month(rows_2022, "2022-01"), "2022 era caption")
 
+    cands = ["2026-01", "2026-02", "2026-03", "2026-04"]
+    expect(months_to_fetch(cands, set()) == cands, "incremental: empty fetches all")
+    expect(months_to_fetch(cands, set(cands)) == ["2026-02", "2026-03", "2026-04"],
+           "incremental: all present rechecks trailing 3")
+    expect(months_to_fetch(cands, {"2026-01", "2026-02"}) ==
+           ["2026-02", "2026-03", "2026-04"], "incremental: new months + recheck")
+
     if failures:
         print("SELF-TEST FAILED:")
         for line in failures:
@@ -444,11 +453,22 @@ def self_test():
 
 # ------------------------------------------------------------------------ main
 
+def months_to_fetch(candidate_months, existing_months, recheck=RECHECK_MONTHS):
+    """Which candidate 'yyyy-MM' strings to (re)download: everything not already present,
+    plus the trailing `recheck` months (MOJ occasionally restates a recent month).
+    `candidate_months` must be sorted ascending. Mirrors the ISA scraper's incremental
+    strategy: new months are always fetched, old ones skipped, a small tail rechecked."""
+    cutoff = len(candidate_months) - recheck
+    return [m for i, m in enumerate(candidate_months)
+            if m not in existing_months or i >= cutoff]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch MOJ monthly 在留資格審査 Excel tables.")
     parser.add_argument("--months", default="gap",
-                        help="'gap' (e-Stat hole 2018-02→2020-10), 'all' (every month "
-                             "on the index), or comma-separated yyyy-MM")
+                        help="'incremental' (index months missing from --merge-into, plus "
+                             "a trailing recheck), 'all' (every month on the index), 'gap' "
+                             "(e-Stat hole 2018-02→2020-10), or comma-separated yyyy-MM")
     parser.add_argument("--out", type=Path, help="Write records to this JSON file")
     parser.add_argument("--merge-into", type=Path,
                         help="Existing japan_monthly_stats.json to merge into (in place)")
@@ -466,6 +486,11 @@ def main():
         wanted = GAP_MONTHS
     elif args.months == "all":
         wanted = sorted(links)
+    elif args.months == "incremental":
+        if not args.merge_into or not args.merge_into.exists():
+            parser.error("--months incremental requires an existing --merge-into file")
+        existing_months = {r["month"] for r in json.loads(args.merge_into.read_text())}
+        wanted = months_to_fetch(sorted(links), existing_months)
     else:
         wanted = args.months.split(",")
     missing = [m for m in wanted if m not in links]
