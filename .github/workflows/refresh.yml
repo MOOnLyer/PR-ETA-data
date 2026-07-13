@@ -1,0 +1,80 @@
+# Refreshes the three public dataset JSONs monthly and commits any changes.
+#
+# This repo is the public data mirror for the private PR ETA app: its raw URLs
+# (raw.githubusercontent.com/MOOnLyer/PR-ETA-data/main/*.json) are what the app's in-app
+# updater reads. No credentials — the built-in GITHUB_TOKEN commits to this same repo.
+#
+# Runs on the 16th (State typically publishes next month's Visa Bulletin mid-month) and
+# can be triggered manually from the Actions tab.
+
+name: Refresh datasets
+
+on:
+  schedule:
+    - cron: "0 3 16 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore Visa Bulletin page cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/vb
+          key: visa-bulletin-pages-${{ github.run_id }}
+          restore-keys: visa-bulletin-pages-
+
+      - name: Refresh U.S. Visa Bulletin
+        run: |
+          python3 scripts/fetch_visa_bulletin.py --self-test
+          END=$(date -u -d "+6 months" +%Y-%m)
+          python3 scripts/fetch_visa_bulletin.py --start 2001-12 --end "$END" \
+            --cache-dir .cache/vb --out us_visa_bulletin.json
+
+      - name: Refresh Japan flow (MOJ monthly Excel)
+        run: |
+          python3 scripts/fetch_moj_monthly.py --self-test
+          RECENT=$(python3 -c "
+          from datetime import date
+          y, m = date.today().year, date.today().month
+          months = []
+          for _ in range(8):
+              months.append(f'{y:04d}-{m:02d}')
+              y, m = (y, m - 1) if m > 1 else (y - 1, 12)
+          print(','.join(reversed(months)))
+          ")
+          python3 scripts/fetch_moj_monthly.py --months "$RECENT" \
+            --merge-into japan_monthly_stats.json
+
+      - name: Refresh ISA processing periods
+        run: |
+          python3 -m pip install --quiet pdfplumber
+          python3 scripts/fetch_isa_periods.py --self-test
+          python3 scripts/fetch_isa_periods.py --merge-into japan_processing_periods.json
+
+      # A partial fetch (site flake) would shrink a blind-written file; restore any dataset
+      # that lost records so the run commits only the datasets that genuinely grew and
+      # never propagates a regression to app installs.
+      - name: Guard against dataset regressions
+        run: |
+          python3 scripts/check_dataset_regression.py --self-test
+          python3 scripts/check_dataset_regression.py --revert \
+            us_visa_bulletin.json japan_monthly_stats.json japan_processing_periods.json
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet; then
+            echo "Datasets unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898270+github-actions[bot]@users.noreply.github.com"
+          git add us_visa_bulletin.json japan_monthly_stats.json japan_processing_periods.json
+          git commit -m "Refresh datasets (automated)"
+          git push
