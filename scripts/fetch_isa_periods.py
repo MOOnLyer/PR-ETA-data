@@ -44,6 +44,7 @@ from pathlib import Path
 ARCHIVE_URL = "https://www.moj.go.jp/isa/applications/resources/nyuukokukanri07_00140.html"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
 FIRST_MONTH_WITH_PR = (2025, 2)   # 永住者 row first appears in the 令和7年2月 PDF
+RECHECK_MONTHS = 2                 # re-download this many trailing months for restatements
 
 
 def fetch(url, binary=False):
@@ -93,6 +94,20 @@ def pr_days_from_text(text):
     return None
 
 
+def months_to_fetch(candidate_months, existing_months, recheck=RECHECK_MONTHS):
+    """Which candidate (year, month) tuples to (re)download.
+
+    `candidate_months` is the sorted-ascending list of PR-era months the archive offers;
+    `existing_months` is the set already in the merge target. Fetch every month not yet
+    present, plus the trailing `recheck` months regardless (the ISA occasionally restates a
+    recent figure). Everything else is skipped — so a routine run downloads ~0-2 PDFs
+    instead of the whole PR era, which matters once this runs daily.
+    """
+    cutoff = len(candidate_months) - recheck
+    return [ym for i, ym in enumerate(candidate_months)
+            if ym not in existing_months or i >= cutoff]
+
+
 def monthly_records(monthly_values):
     """{(year, month): days} -> canonical monthly records, sorted."""
     return [
@@ -139,6 +154,16 @@ def self_test():
         {"month": "2025-05", "averageDays": 300.0, "provenance": "official"},
     ], f"monthly records: {records}")
 
+    cands = [(2025, 2), (2025, 3), (2025, 4), (2025, 5)]
+    # Nothing yet → fetch all.
+    expect(months_to_fetch(cands, set()) == cands, "empty target fetches all")
+    # All present → only the trailing 2 (restatement recheck).
+    expect(months_to_fetch(cands, set(cands)) == [(2025, 4), (2025, 5)],
+           "all present re-checks trailing 2")
+    # A gap in the middle plus the recheck window.
+    expect(months_to_fetch(cands, {(2025, 2), (2025, 4)}) ==
+           [(2025, 3), (2025, 4), (2025, 5)], "missing month + recheck window")
+
     if failures:
         print("SELF-TEST FAILED:")
         for line in failures:
@@ -166,9 +191,23 @@ def main():
         parser.error("provide --out or --merge-into (or --self-test)")
 
     links = monthly_pdf_links(fetch(ARCHIVE_URL))
+    candidates = sorted((y, m, url) for (y, m, url) in links
+                        if (y, m) >= FIRST_MONTH_WITH_PR)
+    candidate_months = [(y, m) for (y, m, _) in candidates]
+
+    # Incremental when merging: skip months already in the target (except the trailing
+    # recheck window). A fresh --out run fetches everything.
+    existing = (json.loads(args.merge_into.read_text())
+                if args.merge_into and args.merge_into.exists() else [])
+    if args.merge_into:
+        have = {tuple(int(p) for p in r["month"].split("-")) for r in existing}
+        wanted = set(months_to_fetch(candidate_months, have))
+    else:
+        wanted = set(candidate_months)
+
     monthly = {}
-    for year, month, url in links:
-        if (year, month) < FIRST_MONTH_WITH_PR:
+    for year, month, url in candidates:
+        if (year, month) not in wanted:
             continue
         try:
             days = extract_pr_days(fetch(url, binary=True))
@@ -184,8 +223,6 @@ def main():
     records = monthly_records(monthly)
 
     if args.merge_into:
-        existing = (json.loads(args.merge_into.read_text())
-                    if args.merge_into.exists() else [])
         combined = {(r["month"], r.get("office")): r for r in existing}
         added = sum(1 for r in records
                     if (r["month"], r.get("office")) not in combined)

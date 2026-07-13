@@ -1,17 +1,21 @@
-# Refreshes the three public dataset JSONs monthly and commits any changes.
+# Refreshes the three public dataset JSONs daily and commits any changes.
 #
 # This repo is the public data mirror for the private PR ETA app: its raw URLs
 # (raw.githubusercontent.com/MOOnLyer/PR-ETA-data/main/*.json) are what the app's in-app
 # updater reads. No credentials — the built-in GITHUB_TOKEN commits to this same repo.
 #
-# Runs on the 16th (State typically publishes next month's Visa Bulletin mid-month) and
-# can be triggered manually from the Actions tab.
+# Runs daily: the three government sources each publish about monthly but on an
+# unpredictable day, so a daily poll catches new figures within 24h. Runs are cheap and
+# gentle on the sources — the Visa Bulletin page cache re-fetches only genuinely new
+# months, MOJ re-pulls just its trailing 8-month window, and the ISA scraper re-downloads
+# only new months plus a 2-month restatement recheck. Almost every run finds nothing new,
+# passes the regression gate, and commits nothing. Also triggerable from the Actions tab.
 
 name: Refresh datasets
 
 on:
   schedule:
-    - cron: "0 3 16 * *"
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 permissions:
