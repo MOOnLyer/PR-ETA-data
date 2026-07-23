@@ -1,0 +1,19 @@
+# Temporary diagnostic: is the Visa Bulletin PDF reachable from a GitHub runner while
+# the HTML pages are Cloudflare-blocked? Delete after use.
+name: Probe bulletin endpoints
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        run: |
+          for u in \
+            "https://travel.state.gov/content/dam/visas/Bulletins/visabulletin_August2026.pdf" \
+            "https://travel.state.gov/content/dam/visas/Bulletins/visabulletin_July2026.pdf" \
+            "https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin/2026/visa-bulletin-for-august-2026.html"; do
+            code=$(curl -s -o /tmp/body -w "%{http_code}" -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" --max-time 60 "$u")
+            size=$(stat -c%s /tmp/body 2>/dev/null || echo 0)
+            magic=$(head -c 5 /tmp/body | tr -d '\0')
+            echo "PROBE $code size=$size magic=[$magic] $u"
+          done
