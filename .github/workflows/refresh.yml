@@ -97,3 +97,11 @@ jobs:
           git add us_visa_bulletin.json japan_monthly_stats.json japan_processing_periods.json
           git commit -m "Refresh datasets (automated)"
           git push
+
+      # Runs last so the Japan datasets still commit above: a red run here means the
+      # expected Visa Bulletin month is missing — i.e. the fetch is being silently
+      # blocked (Cloudflare bot protection, first seen July 2026) or State is late.
+      # The failure notification is the signal to do the manual browser recovery
+      # described in scripts/check_bulletin_freshness.py.
+      - name: Bulletin freshness gate
+        run: python3 scripts/check_bulletin_freshness.py us_visa_bulletin.json

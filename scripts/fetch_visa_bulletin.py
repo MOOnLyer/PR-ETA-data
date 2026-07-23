@@ -263,23 +263,31 @@ def parse_bulletin(raw, month_key):
 
 
 def _download(url, retries=3):
+    """One candidate URL -> HTML or None. Every giving-up path logs the reason to
+    stderr: a silent None cannot be distinguished from 'not published yet', which is
+    exactly how a bot-blocking 403 went unnoticed for a week (July 2026)."""
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    failure = "unknown"
     for attempt in range(retries):
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
                 if response.status != 200:
-                    return None
+                    failure = f"HTTP {response.status}"
+                    break
                 return response.read().decode("utf-8", errors="replace")
         except urllib.error.HTTPError as error:
+            failure = f"HTTP {error.code}"
             if error.code == 404:
-                return None  # try the next candidate slug
+                break  # candidate slug doesn't exist; still worth one log line
             if attempt == retries - 1:
-                return None
+                break
             time.sleep(2 * (attempt + 1))
-        except Exception:  # noqa: BLE001 - network best effort
+        except Exception as error:  # noqa: BLE001 - network best effort
+            failure = type(error).__name__
             if attempt == retries - 1:
-                return None
+                break
             time.sleep(2 * (attempt + 1))
+    print(f"  ! {failure} {url}", file=sys.stderr)
     return None
 
 
