@@ -54,10 +54,27 @@ CATEGORY_MAP = {
     "1st": "EB1", "2nd": "EB2", "3rd": "EB3", "4th": "EB4",
     "f1": "F1", "f2a": "F2A", "f2b": "F2B", "f3": "F3", "f4": "F4",
 }
-# Row labels we intentionally skip (sub-categories the app's model doesn't track):
-# the EB-3 "Other Workers" and EB-4 "Certain Religious Workers" sub-lines, and the
-# post-2022 EB-5 set-aside carve-outs (Rural / High Unemployment / Infrastructure).
-SKIP_ROWS = {"otherworkers", "certainreligiousworkers", "5thsetaside"}
+# Sub-category rows nested inside a preference: the EB-3 "Other Workers" line, the EB-4
+# "Certain Religious Workers" line, and the post-2022 EB-5 set-aside carve-outs. Each
+# publishes its own cutoff, often years away from its parent's, so they are tracked as
+# first-class categories rather than folded into the parent (which would silently
+# corrupt it) or dropped (which would leave real applicants unmodeled).
+SUBCATEGORY_MAP = {
+    # Covers "Other Workers", the lone 2009-09 "Other Worker" typo, and "Other Workers*".
+    "otherworker": "EW",
+    "certainreligiousworkers": "SR",
+}
+# EB-5 reserved carve-outs (EB-5 Reform and Integrity Act of 2022). The bulletin spells
+# these a dozen ways across eras and tables — "5th Set Aside: Rural (20%)",
+# "5th Set Aside: (Rural - 20%)", "5th Set Aside: Rural (20%, including NR, RR)",
+# "5th Set Aside: (Rural: NR, RR - 20%)" — so the reserve is identified by searching the
+# label for its name instead of matching any one spelling.
+EB5_SET_ASIDES = (("rural", "EB5R"),
+                  ("highunemployment", "EB5H"),
+                  ("infrastructure", "EB5I"))
+# Page-validation only: the mainline preferences that every era's bulletin publishes.
+# The sub-categories above are deliberately excluded — the set-asides did not exist
+# before 2022, so requiring them would reject two decades of pages as malformed.
 EXPECTED_CATEGORIES = {
     "F1", "F2A", "F2B", "F3", "F4",
     "EB1", "EB2", "EB3", "EB4", "EB5",
@@ -74,13 +91,20 @@ def resolve_category(label, section):
 
     EB-5's label has changed repeatedly ("5th", "5th Targeted Employment Areas/Regional
     Centers", "5th Non-Regional Center"/"5th Regional Center", "5th Unreserved"). The
-    set-aside carve-outs are removed by SKIP_ROWS first, so any remaining "5th…" row is
-    the general EB-5 line, whatever its era's wording; per-key dedup keeps the first.
+    set-aside carve-outs are matched first, so any remaining "5th…" row is the general
+    unreserved EB-5 line, whatever its era's wording; per-key dedup keeps the first.
     """
-    if any(label.startswith(skip) for skip in SKIP_ROWS):
-        return None
-
     if section == "employment":
+        for prefix, category in SUBCATEGORY_MAP.items():
+            if label.startswith(prefix):
+                return category
+        if label.startswith("5thsetaside"):
+            for needle, category in EB5_SET_ASIDES:
+                if needle in label:
+                    return category
+            # An unrecognized future carve-out: skip it rather than let it fall through
+            # to the "5th" branch and overwrite the unreserved EB-5 line.
+            return None
         if label.startswith("5th"):
             return "EB5"
         for prefix, category in (("1st", "EB1"), ("2nd", "EB2"),
@@ -601,9 +625,39 @@ def self_test():
         actual = by_key.get(key)
         if actual != expected:
             failures.append(f"{key}: expected {expected}, got {actual}")
-    # "Other Workers" must be skipped (not mapped to EB3).
+    # "Other Workers" resolves to its own EW category and is never folded into EB3.
+    # The fixture has no "3rd" row, so any EB3 entry would mean the sub-line leaked.
     if any(e["category"] == "EB3" for e in entries):
         failures.append("Other Workers leaked into EB3")
+    if by_key.get(("finalAction", "EW", "india")) != "2012-08-22":
+        failures.append(f"Other Workers -> EW india: {by_key.get(('finalAction','EW','india'))}")
+
+    # Every row label the 2001-2026 archive actually contains, resolved. The set-asides
+    # alone ship in twelve spellings across two eras and both tables.
+    for raw, want in (
+            ("Other Workers", "EW"), ("Other Worker", "EW"), ("Other Workers*", "EW"),
+            ("Certain Religious Workers", "SR"),
+            ("5th Set Aside: Rural (20%)", "EB5R"),
+            ("5th Set Aside: (Rural - 20%)", "EB5R"),
+            ("5th Set Aside: Rural (20%, including NR, RR)", "EB5R"),
+            ("5th Set Aside: (Rural: NR, RR - 20%)", "EB5R"),
+            ("5th Set Aside: High Unemployment (10%)", "EB5H"),
+            ("5th Set Aside: (High Unemployment - 10%)", "EB5H"),
+            ("5th Set Aside: High Unemployment (10%, including NH, RH)", "EB5H"),
+            ("5th Set Aside: (High Unemployment: NH, RH - 10%)", "EB5H"),
+            ("5th Set Aside: Infrastructure (2%)", "EB5I"),
+            ("5th Set Aside: (Infrastructure - 2%)", "EB5I"),
+            ("5th Set Aside: Infrastructure (2%, including RI)", "EB5I"),
+            ("5th Set Aside: (Infrastructure: RI - 2%)", "EB5I"),
+            ("5th", "EB5"), ("5th Unreserved", "EB5"),
+            ("5th Non-Regional Center (C5 and T5)", "EB5"),
+            ("5th Targeted Employment Areas/ Regional Centers and Pilot Programs", "EB5"),
+            # An unknown future carve-out must be skipped, never mistaken for unreserved.
+            ("5th Set Aside: Something New (5%)", None),
+    ):
+        got = resolve_category(normalize(raw), "employment")
+        if got != want:
+            failures.append(f"label {raw!r} -> {got}, want {want}")
     if parse_cutoff_date("22MAR05") != "2005-03-22":
         failures.append("date parse 22MAR05")
     if parse_cutoff_date("01DEC99") != "1999-12-01":
@@ -635,6 +689,8 @@ def self_test():
            "legacy tables default to Final Action")
     expect(not any(e["category"] == "EB3" and e["status"] == "2003-07-22" for e in legacy),
            "legacy Other Workers must not leak into EB3")
+    expect(legacy_by_key.get(("finalAction", "EW", "china")) == "2003-07-22",
+           "legacy Other Workers resolved to EW")
     # Section-scoped resolution: legacy family "1st/2A/2B/3rd/4th" must become F-categories,
     # and must not shadow the employment ordinals of the same name.
     expect(legacy_by_key.get(("finalAction", "F1", "india")) == "2006-01-01",
