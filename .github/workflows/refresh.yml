@@ -2,7 +2,8 @@
 #
 # This repo is the public data mirror for the private PR ETA app: its raw URLs
 # (raw.githubusercontent.com/MOOnLyer/PR-ETA-data/main/*.json) are what the app's in-app
-# updater reads. No credentials — the built-in GITHUB_TOKEN commits to this same repo.
+# updater reads. The built-in GITHUB_TOKEN commits to this same repo; an optional
+# SCRAPERAPI_KEY secret is used only if both direct State Department routes fail.
 #
 # Runs daily: the three government sources each publish about monthly but on an
 # unpredictable day, so a daily poll catches new figures within 24h. Runs are cheap and
@@ -59,9 +60,15 @@ jobs:
           fi
 
       - name: Refresh U.S. Visa Bulletin
+        env:
+          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
+          SCRAPERAPI_MAX_REQUESTS: "4"
         run: |
           python3 scripts/fetch_visa_bulletin.py --self-test
-          END=$(date -u -d "+6 months" +%Y-%m)
+          python3 -m unittest scripts.test_fetch_visa_bulletin
+          # State publishes at most the next month's bulletin. Looking six months ahead
+          # only probes nonexistent pages and could consume paid proxy credits for 404s.
+          END=$(date -u -d "$(date -u +%Y-%m-01) +1 month" +%Y-%m)
           python3 scripts/fetch_visa_bulletin.py --start 2001-12 --end "$END" \
             --cache-dir .cache/vb --out us_visa_bulletin.json
 
@@ -99,8 +106,8 @@ jobs:
           git push
 
       # Runs last so the Japan datasets still commit above: a red run here means the
-      # expected Visa Bulletin month is missing — i.e. the fetch is being silently
-      # blocked (Cloudflare bot protection, first seen July 2026) or State is late.
+      # expected Visa Bulletin month is missing — i.e. all configured fetch routes failed
+      # (Cloudflare bot protection was first seen July 2026) or State is late.
       # The failure notification is the signal to do the manual browser recovery
       # described in scripts/check_bulletin_freshness.py.
       - name: Bulletin freshness gate

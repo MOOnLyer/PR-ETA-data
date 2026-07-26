@@ -6,7 +6,9 @@ Filing tables (both employment- and family-sponsored), and emits the canonical J
 PRETACore's VisaBulletinParser ingests — with provenance "official".
 
 Source: https://travel.state.gov/.../visa-bulletin/{fiscalYear}/visa-bulletin-for-{month}-{year}.html
-The static tables are present in the page HTML even though the page shows a CAPTCHA overlay.
+The bulletin tables are static HTML, so JavaScript rendering is not required.
+If Cloudflare blocks that canonical host, the fetcher tries the same State Department
+content on an official sibling host, then optionally ScraperAPI when SCRAPERAPI_KEY is set.
 
 Usage:
     # Fetch a range and write the canonical dataset:
@@ -25,16 +27,27 @@ Only the Python standard library is used.
 import argparse
 import html as htmllib
 import json
+import os
 import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
+from collections import namedtuple
 from pathlib import Path
 
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15"
+PRIMARY_HOST = "travel.state.gov"
+OFFICIAL_FALLBACK_HOST = "childabduction.state.gov"
+OFFICIAL_HOSTS = {PRIMARY_HOST, OFFICIAL_FALLBACK_HOST}
+SCRAPERAPI_ENDPOINT = "https://api.scraperapi.com/"
+SCRAPERAPI_TIMEOUT = 75
+SCRAPERAPI_MAX_COST = "10"
+SCRAPERAPI_DEFAULT_MAX_REQUESTS = 4
 MONTH_NAMES = ["january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december"]
+DownloadResult = namedtuple("DownloadResult", "body status failure")
 
 # Row-label prefix (normalized: lowercased, spaces/hyphens removed) -> USCategory raw value.
 CATEGORY_MAP = {
@@ -45,6 +58,10 @@ CATEGORY_MAP = {
 # the EB-3 "Other Workers" and EB-4 "Certain Religious Workers" sub-lines, and the
 # post-2022 EB-5 set-aside carve-outs (Rural / High Unemployment / Infrastructure).
 SKIP_ROWS = {"otherworkers", "certainreligiousworkers", "5thsetaside"}
+EXPECTED_CATEGORIES = {
+    "F1", "F2A", "F2B", "F3", "F4",
+    "EB1", "EB2", "EB3", "EB4", "EB5",
+}
 
 
 def resolve_category(label, section):
@@ -148,12 +165,12 @@ def fiscal_year_dir(year, month):
     return year + 1 if month >= 10 else year
 
 
-def bulletin_urls(year, month):
+def bulletin_urls(year, month, host=PRIMARY_HOST):
     """Candidate URLs for one bulletin. The State Dept. slug is inconsistent: most months
     are 'visa-bulletin-for-{month}-{year}', but some (e.g. October 2012) drop the 'for-'."""
     fy = fiscal_year_dir(year, month)
     name = MONTH_NAMES[month - 1]
-    base = ("https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin/"
+    base = (f"https://{host}/content/travel/en/legal/visa-law0/visa-bulletin/"
             f"{fy}")
     return [
         f"{base}/visa-bulletin-for-{name}-{year}.html",
@@ -262,24 +279,63 @@ def parse_bulletin(raw, month_key):
     return entries
 
 
-def _download(url, retries=3):
-    """One candidate URL -> HTML or None. Every giving-up path logs the reason to
-    stderr: a silent None cannot be distinguished from 'not published yet', which is
-    exactly how a bot-blocking 403 went unnoticed for a week (July 2026)."""
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+def _validation_failure(raw, month_key):
+    """Why a downloaded page is unsafe to label/cache as `month_key`, or None.
+
+    A nonempty parse alone is insufficient: parse_bulletin stamps the caller-supplied
+    month onto every row, so a redirect to an older bulletin would otherwise silently
+    relabel valid-but-wrong data. Requiring near-complete worldwide category coverage
+    also rejects truncated HTTP 200 responses while tolerating March 2003's one malformed
+    source row.
+    """
+    year, month = (int(part) for part in month_key.split("-"))
+    title_match = re.search(r"<title[^>]*>(.*?)</title>", raw, flags=re.S | re.I)
+    if title_match is None:
+        return "missing HTML title"
+    title = re.sub(r"\s+", " ", strip_tags(title_match.group(1))).strip().lower()
+    title_tokens = set(re.findall(r"[a-z0-9]+", title))
+    expected_tokens = {"visa", "bulletin", MONTH_NAMES[month - 1], str(year)}
+    if not expected_tokens.issubset(title_tokens):
+        return f"page title {title!r} does not identify {month_key}"
+
+    entries = parse_bulletin(raw, month_key)
+    required_tables = ["finalAction"]
+    if (year, month) >= (2015, 10):
+        required_tables.append("datesForFiling")
+    for table in required_tables:
+        categories = {
+            entry["category"] for entry in entries
+            if entry["table"] == table and entry["area"] == "worldwide"
+        }
+        if len(categories & EXPECTED_CATEGORIES) < 9:
+            missing = ", ".join(sorted(EXPECTED_CATEGORIES - categories))
+            return f"incomplete {table} worldwide categories (missing: {missing})"
+    return None
+
+
+def _request(request, display_url, retries=3, timeout=30):
+    """Run one HTTP route and retain its final status for fallback decisions."""
     failure = "unknown"
+    status = None
     for attempt in range(retries):
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                status = response.status
                 if response.status != 200:
                     failure = f"HTTP {response.status}"
-                    break
-                return response.read().decode("utf-8", errors="replace")
+                    if response.status in (403, 404) or attempt == retries - 1:
+                        break
+                    time.sleep(2 * (attempt + 1))
+                    continue
+                body = response.read().decode("utf-8", errors="replace")
+                return DownloadResult(body, 200, None)
         except urllib.error.HTTPError as error:
+            status = error.code
             failure = f"HTTP {error.code}"
-            if error.code == 404:
-                break  # candidate slug doesn't exist; still worth one log line
-            if attempt == retries - 1:
+            error.close()
+            # A Cloudflare block is deterministic for this egress identity; retrying it
+            # only delays the useful route. A 404 is definitive for this candidate slug.
+            if error.code in (403, 404) or attempt == retries - 1:
                 break
             time.sleep(2 * (attempt + 1))
         except Exception as error:  # noqa: BLE001 - network best effort
@@ -287,20 +343,154 @@ def _download(url, retries=3):
             if attempt == retries - 1:
                 break
             time.sleep(2 * (attempt + 1))
-    print(f"  ! {failure} {url}", file=sys.stderr)
-    return None
+    print(f"  ! {failure} {display_url}", file=sys.stderr)
+    return DownloadResult(None, status, failure)
 
 
-def fetch_page(year, month, cache_dir, retries=3):
+def _download_result(url, retries=3):
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    return _request(request, url, retries=retries)
+
+
+def _download(url, retries=3):
+    """Backward-compatible body-only wrapper for one candidate URL."""
+    return _download_result(url, retries=retries).body
+
+
+def _download_via_scraperapi(url, api_key):
+    """Fetch one validated State URL through ScraperAPI without putting its key in a URL."""
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or parsed.hostname not in OFFICIAL_HOSTS:
+        raise ValueError(f"refusing to proxy non-State URL: {url}")
+
+    proxy_url = SCRAPERAPI_ENDPOINT + "?" + urllib.parse.urlencode({"url": url})
+    request = urllib.request.Request(proxy_url, headers={
+        "x-sapi-api_key": api_key,
+        "x-sapi-premium": "true",
+        "x-sapi-max_cost": SCRAPERAPI_MAX_COST,
+    })
+    print(f"  ↪ ScraperAPI fallback for {url}", file=sys.stderr)
+    return _request(
+        request,
+        f"ScraperAPI for {url}",
+        retries=1,  # ScraperAPI performs its own retries for up to about 70 seconds.
+        timeout=SCRAPERAPI_TIMEOUT,
+    )
+
+
+def _looks_like_bot_block(result):
+    if result.body is None:
+        return False
+    lowered = result.body.lower()
+    return (
+        "attention required! | cloudflare" in lowered
+        or "cf-chl-" in lowered
+        or ("captcha" in lowered and not parse_bulletin(result.body, "0000-00"))
+    )
+
+
+class ScraperAPIFallback:
+    """A shared, run-bounded paid fallback with a credential-failure circuit breaker."""
+
+    def __init__(self, api_key, max_requests=SCRAPERAPI_DEFAULT_MAX_REQUESTS):
+        self.api_key = api_key.strip()
+        self.remaining = max(0, max_requests)
+        self._limit_logged = False
+
+    @classmethod
+    def from_environment(cls):
+        raw_limit = os.environ.get(
+            "SCRAPERAPI_MAX_REQUESTS", str(SCRAPERAPI_DEFAULT_MAX_REQUESTS))
+        try:
+            max_requests = int(raw_limit)
+        except ValueError:
+            print(f"  ! invalid SCRAPERAPI_MAX_REQUESTS={raw_limit!r}; using "
+                  f"{SCRAPERAPI_DEFAULT_MAX_REQUESTS}", file=sys.stderr)
+            max_requests = SCRAPERAPI_DEFAULT_MAX_REQUESTS
+        return cls(os.environ.get("SCRAPERAPI_KEY", ""), max_requests)
+
+    def fetch(self, url):
+        if not self.api_key:
+            return None
+        if self.remaining == 0:
+            if not self._limit_logged:
+                print("  ! ScraperAPI per-run request limit reached; paid fallback "
+                      "disabled for remaining pages", file=sys.stderr)
+                self._limit_logged = True
+            return None
+
+        self.remaining -= 1
+        result = _download_via_scraperapi(url, self.api_key)
+        if result.status in (401, 403):
+            # ScraperAPI uses these for invalid/exhausted credentials or max-cost
+            # refusal. Another slug cannot repair account configuration this run.
+            self.api_key = ""
+        return result
+
+
+def _validated_body(result, source_url, month_key, cache_file):
+    """Accept and cache only HTML that actually contains Visa Bulletin data."""
+    if result.body is None:
+        return None
+    failure = _validation_failure(result.body, month_key)
+    if failure is not None:
+        print(f"  ! invalid Visa Bulletin HTTP 200 from {source_url}: {failure}",
+              file=sys.stderr)
+        return None
+    if cache_file:
+        cache_file.write_text(result.body, encoding="utf-8")
+    return result.body
+
+
+def fetch_page(year, month, cache_dir, retries=3, scraperapi=None):
     cache_file = cache_dir / f"{year:04d}-{month:02d}.html" if cache_dir else None
+    month_key = f"{year:04d}-{month:02d}"
     if cache_file and cache_file.exists():
-        return cache_file.read_text(encoding="utf-8", errors="replace")
-    for url in bulletin_urls(year, month):
-        body = _download(url, retries=retries)
+        cached = cache_file.read_text(encoding="utf-8", errors="replace")
+        failure = _validation_failure(cached, month_key)
+        if failure is None:
+            return cached
+        print(f"  ! ignoring invalid cached bulletin {cache_file}: {failure}",
+              file=sys.stderr)
+
+    scraperapi = scraperapi or ScraperAPIFallback.from_environment()
+    primary_urls = bulletin_urls(year, month, PRIMARY_HOST)
+    official_fallback_urls = bulletin_urls(year, month, OFFICIAL_FALLBACK_HOST)
+
+    for primary_url, official_fallback_url in zip(primary_urls, official_fallback_urls):
+        primary = _download_result(primary_url, retries=retries)
+        bot_blocked = primary.status == 403 or _looks_like_bot_block(primary)
+        body = _validated_body(primary, primary_url, month_key, cache_file)
         if body is not None:
-            if cache_file:
-                cache_file.write_text(body, encoding="utf-8")
             return body
+        if primary.status == 404:
+            continue  # The canonical host reached the origin: try the alternate slug.
+
+        official_fallback = _download_result(
+            official_fallback_url, retries=retries)
+        bot_blocked = (
+            bot_blocked
+            or official_fallback.status == 403
+            or _looks_like_bot_block(official_fallback)
+        )
+        body = _validated_body(
+            official_fallback, official_fallback_url, month_key, cache_file)
+        if body is not None:
+            print(f"  ↪ official-host fallback for {primary_url}", file=sys.stderr)
+            return body
+        if official_fallback.status == 404:
+            # Both hostnames serve the same State AEM content. This is an authoritative
+            # "not published under this slug", so do not buy the same 404 from a proxy.
+            continue
+
+        if bot_blocked:
+            proxied = scraperapi.fetch(primary_url)
+        else:
+            proxied = None
+        if proxied is not None:
+            body = _validated_body(proxied, primary_url, month_key, cache_file)
+            if body is not None:
+                return body
     return None
 
 
@@ -514,24 +704,33 @@ def main():
     if cache_dir:
         cache_dir.mkdir(parents=True, exist_ok=True)
 
-    all_entries = []
     months = list(month_range(args.start, args.end))
+    entries_by_month = {}
+    scraperapi = ScraperAPIFallback.from_environment()
     fetched = 0
-    for year, month in months:
+    # Fetch newest first so the bounded paid fallback is spent on the freshness-critical
+    # months during a wider cache revalidation. Flatten chronologically before writing.
+    for year, month in reversed(months):
         cached = cache_dir and (cache_dir / f"{year:04d}-{month:02d}.html").exists()
-        raw = fetch_page(year, month, cache_dir)
+        raw = fetch_page(year, month, cache_dir, scraperapi=scraperapi)
         if not cached and args.delay:
             time.sleep(args.delay)
         if raw is None:
             continue
-        entries = parse_bulletin(raw, f"{year:04d}-{month:02d}")
+        month_key = f"{year:04d}-{month:02d}"
+        entries = parse_bulletin(raw, month_key)
         if entries:
             fetched += 1
-            all_entries.extend(entries)
+            entries_by_month[(year, month)] = entries
             print(f"  {year}-{month:02d}: {len(entries)} entries")
         else:
             print(f"  {year}-{month:02d}: no tables parsed", file=sys.stderr)
 
+    all_entries = [
+        entry
+        for year, month in months
+        for entry in entries_by_month.get((year, month), [])
+    ]
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(all_entries, indent=0))
     print(f"\nWrote {len(all_entries)} entries from {fetched}/{len(months)} months "
