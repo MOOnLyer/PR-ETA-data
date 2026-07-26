@@ -1,0 +1,44 @@
+# Temporary: inventory every distinct preference-table row label in the cached
+# bulletin HTML, so category mappings can be written against ground truth. Delete after.
+name: Inventory bulletin row labels
+on: workflow_dispatch
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v4
+        with:
+          path: .cache/vb
+          key: visa-bulletin-pages-${{ github.run_id }}
+          restore-keys: visa-bulletin-pages-
+      - name: Inventory
+        run: |
+          python3 - <<'PY'
+          import sys, glob, collections
+          sys.path.insert(0, 'scripts')
+          import fetch_visa_bulletin as vb
+          files = sorted(glob.glob('.cache/vb/*.html'))
+          print("cached pages:", len(files))
+          info = collections.defaultdict(lambda: {"n":0,"raw":set(),"months":[]})
+          for f in files:
+              month = f.split('/')[-1][:-5]
+              raw = open(f, encoding='utf-8', errors='replace').read()
+              for table_html, rows in vb._iter_tables(raw):
+                  if not rows: continue
+                  hi, col_area = vb._area_header(rows)
+                  if col_area is None: continue
+                  section = vb._detect_section(rows)
+                  if section is None: continue
+                  for row in rows[hi:]:
+                      if not row or not row[0].strip(): continue
+                      key = (section, vb.normalize(row[0]))
+                      e = info[key]; e["n"] += 1
+                      e["raw"].add(row[0].strip()[:70]); e["months"].append(month)
+          for (section, norm), e in sorted(info.items()):
+              cat = vb.resolve_category(norm, section)
+              months = sorted(e["months"])
+              print(f"{section:11} {'-> '+str(cat):10} n={e['n']:5} {months[0]}..{months[-1]}  {norm[:44]!r}")
+              for r in sorted(e["raw"])[:2]:
+                  print(f"{'':36} raw: {r!r}")
+          PY
