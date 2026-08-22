@@ -213310,5 +213310,1205 @@
 "area": "philippines",
 "status": "C",
 "provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F1",
+"area": "worldwide",
+"status": "2020-01-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F1",
+"area": "china",
+"status": "2020-01-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F1",
+"area": "india",
+"status": "2020-01-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F1",
+"area": "mexico",
+"status": "2008-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F1",
+"area": "philippines",
+"status": "2013-05-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2A",
+"area": "worldwide",
+"status": "2026-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2A",
+"area": "china",
+"status": "2026-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2A",
+"area": "india",
+"status": "2026-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2A",
+"area": "mexico",
+"status": "2025-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2A",
+"area": "philippines",
+"status": "2026-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2B",
+"area": "worldwide",
+"status": "2019-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2B",
+"area": "china",
+"status": "2019-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2B",
+"area": "india",
+"status": "2019-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2B",
+"area": "mexico",
+"status": "2009-02-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F2B",
+"area": "philippines",
+"status": "2013-06-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F3",
+"area": "worldwide",
+"status": "2014-10-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F3",
+"area": "china",
+"status": "2014-10-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F3",
+"area": "india",
+"status": "2014-10-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F3",
+"area": "mexico",
+"status": "2001-07-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F3",
+"area": "philippines",
+"status": "2006-02-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F4",
+"area": "worldwide",
+"status": "2011-10-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F4",
+"area": "china",
+"status": "2011-10-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F4",
+"area": "india",
+"status": "2006-11-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F4",
+"area": "mexico",
+"status": "2001-04-08",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "F4",
+"area": "philippines",
+"status": "2007-08-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F1",
+"area": "worldwide",
+"status": "2020-02-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F1",
+"area": "china",
+"status": "2020-02-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F1",
+"area": "india",
+"status": "2020-02-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F1",
+"area": "mexico",
+"status": "2008-12-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F1",
+"area": "philippines",
+"status": "2015-04-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2A",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2A",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2A",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2A",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2A",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2B",
+"area": "worldwide",
+"status": "2019-09-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2B",
+"area": "china",
+"status": "2019-09-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2B",
+"area": "india",
+"status": "2019-09-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2B",
+"area": "mexico",
+"status": "2010-05-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F2B",
+"area": "philippines",
+"status": "2013-10-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F3",
+"area": "worldwide",
+"status": "2014-11-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F3",
+"area": "china",
+"status": "2014-11-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F3",
+"area": "india",
+"status": "2014-11-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F3",
+"area": "mexico",
+"status": "2001-07-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F3",
+"area": "philippines",
+"status": "2006-08-08",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F4",
+"area": "worldwide",
+"status": "2011-11-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F4",
+"area": "china",
+"status": "2011-11-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F4",
+"area": "india",
+"status": "2006-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F4",
+"area": "mexico",
+"status": "2001-04-30",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "F4",
+"area": "philippines",
+"status": "2008-03-22",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB1",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB1",
+"area": "china",
+"status": "2023-07-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB1",
+"area": "india",
+"status": "2022-10-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB1",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB1",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB2",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB2",
+"area": "china",
+"status": "2021-09-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB2",
+"area": "india",
+"status": "U",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB2",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB2",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB3",
+"area": "worldwide",
+"status": "2024-09-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB3",
+"area": "china",
+"status": "2022-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB3",
+"area": "india",
+"status": "2014-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB3",
+"area": "mexico",
+"status": "2024-09-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB3",
+"area": "philippines",
+"status": "2023-08-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EW",
+"area": "worldwide",
+"status": "2022-04-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EW",
+"area": "china",
+"status": "2019-05-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EW",
+"area": "india",
+"status": "2014-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EW",
+"area": "mexico",
+"status": "2022-04-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EW",
+"area": "philippines",
+"status": "2021-12-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB4",
+"area": "worldwide",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB4",
+"area": "china",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB4",
+"area": "india",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB4",
+"area": "mexico",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB4",
+"area": "philippines",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "SR",
+"area": "worldwide",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "SR",
+"area": "china",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "SR",
+"area": "india",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "SR",
+"area": "mexico",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "SR",
+"area": "philippines",
+"status": "2022-12-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5",
+"area": "china",
+"status": "2016-12-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5",
+"area": "india",
+"status": "U",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5R",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5R",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5R",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5R",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5R",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5H",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5H",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5H",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5H",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5H",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5I",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5I",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5I",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5I",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "finalAction",
+"category": "EB5I",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB1",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB1",
+"area": "china",
+"status": "2023-12-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB1",
+"area": "india",
+"status": "2023-12-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB1",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB1",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB2",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB2",
+"area": "china",
+"status": "2022-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB2",
+"area": "india",
+"status": "2015-01-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB2",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB2",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB3",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB3",
+"area": "china",
+"status": "2022-01-08",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB3",
+"area": "india",
+"status": "2015-01-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB3",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB3",
+"area": "philippines",
+"status": "2024-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EW",
+"area": "worldwide",
+"status": "2022-08-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EW",
+"area": "china",
+"status": "2019-10-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EW",
+"area": "india",
+"status": "2015-01-15",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EW",
+"area": "mexico",
+"status": "2022-08-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EW",
+"area": "philippines",
+"status": "2022-08-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB4",
+"area": "worldwide",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB4",
+"area": "china",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB4",
+"area": "india",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB4",
+"area": "mexico",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB4",
+"area": "philippines",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "SR",
+"area": "worldwide",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "SR",
+"area": "china",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "SR",
+"area": "india",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "SR",
+"area": "mexico",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "SR",
+"area": "philippines",
+"status": "2023-01-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5",
+"area": "china",
+"status": "2017-03-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5",
+"area": "india",
+"status": "2024-05-01",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5R",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5R",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5R",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5R",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5R",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5H",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5H",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5H",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5H",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5H",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5I",
+"area": "worldwide",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5I",
+"area": "china",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5I",
+"area": "india",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5I",
+"area": "mexico",
+"status": "C",
+"provenance": "official"
+},
+{
+"bulletinMonth": "2026-09",
+"table": "datesForFiling",
+"category": "EB5I",
+"area": "philippines",
+"status": "C",
+"provenance": "official"
 }
 ]
