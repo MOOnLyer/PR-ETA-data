@@ -93,5 +93,10 @@
 "month": "2026-08",
 "averageDays": 309.0,
 "provenance": "official"
+},
+{
+"month": "2026-09",
+"averageDays": 335.6,
+"provenance": "official"
 }
 ]
