@@ -25958,5 +25958,115 @@
 "provenance": "official",
 "granted": 470,
 "denied": 164
+},
+{
+"month": "2026-09",
+"office": "fukuoka",
+"received": 1596,
+"decided": 238,
+"pending": 2649,
+"provenance": "official",
+"granted": 141,
+"denied": 88
+},
+{
+"month": "2026-09",
+"office": "hiroshima",
+"received": 1141,
+"decided": 124,
+"pending": 1805,
+"provenance": "official",
+"granted": 87,
+"denied": 29
+},
+{
+"month": "2026-09",
+"office": "kobe",
+"received": 1015,
+"decided": 144,
+"pending": 2262,
+"provenance": "official",
+"granted": 96,
+"denied": 42
+},
+{
+"month": "2026-09",
+"office": "nagoya",
+"received": 9005,
+"decided": 706,
+"pending": 11918,
+"provenance": "official",
+"granted": 548,
+"denied": 115
+},
+{
+"month": "2026-09",
+"office": "naha",
+"received": 338,
+"decided": 26,
+"pending": 451,
+"provenance": "official",
+"granted": 22,
+"denied": 3
+},
+{
+"month": "2026-09",
+"office": "osaka",
+"received": 4528,
+"decided": 749,
+"pending": 10438,
+"provenance": "official",
+"granted": 318,
+"denied": 416
+},
+{
+"month": "2026-09",
+"office": "sapporo",
+"received": 403,
+"decided": 30,
+"pending": 589,
+"provenance": "official",
+"granted": 19,
+"denied": 8
+},
+{
+"month": "2026-09",
+"office": "sendai",
+"received": 545,
+"decided": 76,
+"pending": 823,
+"provenance": "official",
+"granted": 34,
+"denied": 41
+},
+{
+"month": "2026-09",
+"office": "takamatsu",
+"received": 300,
+"decided": 9,
+"pending": 330,
+"provenance": "official",
+"granted": 4,
+"denied": 3
+},
+{
+"month": "2026-09",
+"office": "tokyo",
+"received": 19712,
+"decided": 1534,
+"pending": 55564,
+"provenance": "official",
+"granted": 766,
+"denied": 692
+},
+{
+"month": "2026-09",
+"office": "yokohama",
+"received": 4527,
+"decided": 554,
+"pending": 9192,
+"provenance": "official",
+"granted": 376,
+"denied": 160
 }
 ]
